@@ -1,0 +1,15 @@
+youtube-analytics-pipeline/
+│
+├── src/
+│   ├── ingestion.py
+│   ├── processing.py
+│   ├── database.py
+│
+├── dashboard/
+│   └── app.py
+│
+├── data/
+├── logs/
+├── tests/
+├── config.yaml
+└── README.md
