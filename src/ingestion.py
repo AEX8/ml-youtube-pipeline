@@ -44,13 +44,15 @@ for item in stats_response["items"]:
         "video_id": vid,
         "title": snippet["title"],
         "published_at": snippet["publishedAt"],
+        "duration": item["contentDetails"]["duration"],
         "views": int(item["statistics"].get("viewCount", 0)),
         "likes": int(item["statistics"].get("likeCount", 0)),
         "comments": int(item["statistics"].get("commentCount", 0))
     })
 
 # Save
-with open("youtube_data.json", "w") as f:
+with open("data/youtube_data.json", "w") as f:
     json.dump(videos_data, f, indent=2)
 
 print("Data saved successfully!")
+
