@@ -2,6 +2,7 @@ from googleapiclient.discovery import build
 import json
 import os
 from dotenv import load_dotenv
+from database import insert_videos
 
 load_dotenv()
 
@@ -50,9 +51,15 @@ for item in stats_response["items"]:
         "comments": int(item["statistics"].get("commentCount", 0))
     })
 
-# Save
+# save
 with open("data/youtube_data.json", "w") as f:
     json.dump(videos_data, f, indent=2)
 
+# save to databse
+insert_videos(videos_data)
+print("Data inserted into database successfully!")
+
 print("Data saved successfully!")
+
+
 
