@@ -37,6 +37,20 @@ def insert_videos(videos):
     cur.close()
     conn.close()
 
+# access data 
+def fetch_videos():
+    conn = connect_db()
+    cur = conn.cursor()
+
+    cur.execute("SELECT * FROM videos;")
+    rows = cur.fetchall()
+
+    colnames = [desc[0] for desc in cur.description]
+
+    cur.close()
+    conn.close()
+
+    return rows, colnames
 
 if __name__ == "__main__":
     conn = connect_db()

@@ -15,7 +15,7 @@ youtube = build("youtube", "v3", developerKey=API_KEY)
 search_response = youtube.search().list(
     part="snippet",
     channelId=CHANNEL_ID,
-    maxResults=10,
+    maxResults=100,
     order="date",
     type="video"   # only videos
 ).execute()
