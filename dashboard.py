@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timezone
 import re
-from src.database import fetch_videos
+from database import fetch_videos
 
 # Page Config
 st.set_page_config(page_title="YouTube Analytics", layout="wide")
