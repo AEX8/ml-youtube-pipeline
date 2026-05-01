@@ -6,6 +6,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, r2_score
+
 
 
 def parse_duration(duration):
@@ -121,14 +125,64 @@ def main():
     X = df[features]
     y = df["log_views_per_day"]
 
+    # data split
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42
     )
 
     #scale features
     scaler = StandardScaler()
-    x_train_scaled = scaler.fit_transform(X_train)
-    x_test_scaled = scaler.transform(X_test)
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+
+    # linear regression
+    lr = LinearRegression()
+    lr.fit(X_train_scaled, y_train)
+
+    lr_preds = lr.predict(X_test_scaled)
+
+    lr_mae = mean_absolute_error(y_test, lr_preds)
+    lr_r2 = r2_score(y_test, lr_preds)
+
+    print("\n=== Linear Regression ===")
+    print(f"MAE: {lr_mae:.4f}")
+    print(f"R²: {lr_r2:.4f}")
+
+    # random forest
+    rf = RandomForestRegressor(n_estimators=100, random_state=42)
+    rf.fit(X_train, y_train)
+
+    rf_preds = rf.predict(X_test)
+
+    rf_mae = mean_absolute_error(y_test, rf_preds)
+    rf_r2 = r2_score(y_test, rf_preds)
+
+    print("\n=== Random Forest ===")
+    print(f"MAE: {rf_mae:.4f}")
+    print(f"R²: {rf_r2:.4f}")
+
+    actual = np.expm1(y_test)
+    predicted = np.expm1(rf_preds)
+
+    # plot predictions
+    plt.figure()
+    plt.scatter(actual, predicted)
+    plt.xlabel("Actual (log views/day)")
+    plt.ylabel("Predicted")
+    plt.title("Random Forest: Actual vs Predicted")
+    plt.show()
+
+    feature_importance = pd.Series(rf.feature_importances_, index=X.columns)
+    feature_importance.sort_values().plot(kind="barh")
+    plt.title("Feature Importance (Random Forest)")
+    plt.show()
+
+    print("\nFeature Importance:")
+    print(feature_importance.sort_values(ascending=False))
+
+    
+
+
 
 if __name__ == "__main__":
-    main()
+    main()  
