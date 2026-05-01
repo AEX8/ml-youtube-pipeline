@@ -3,6 +3,9 @@ from database import fetch_videos
 from datetime import datetime, timezone
 import re
 import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 
 
 def parse_duration(duration):
@@ -86,15 +89,46 @@ def correlation(df):
     plt.title("Correlation Heatmap")
     plt.show()
 
+def log_transform(log_views):
+    plt.figure()
+    plt.hist(log_views, bins=20)
+    plt.title("Log Views per Day Distribution")
+    plt.show()
+
+
 def main():
     df = load_data()
 
+    skewness = df['views_per_day'].skew()
+    print(f"Skewness: {skewness}")
     basic_info(df)
     check_missing(df)
-    plot_target(df)
-    plot_features(df)
-    correlation(df)
+    # plot_target(df)
+    # plot_features(df)
+    # correlation(df)
 
+    df['log_views_per_day'] = np.log1p(df['views_per_day'])
+    # log_transform(df['log_views_per_day'])    
+
+    # features
+    features = [
+        "duration_minutes",
+        "days_since_upload",
+        "likes",
+        "comment_ratio"
+    ]
+
+    X = df[features]
+    y = df["log_views_per_day"]
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+
+    #scale features
+    scaler = StandardScaler()
+    x_train_scaled = scaler.fit_transform(X_train)
+    x_test_scaled = scaler.transform(X_test)
 
 if __name__ == "__main__":
     main()
