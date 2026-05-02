@@ -9,8 +9,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score
-
-
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import StratifiedKFold
 
 def parse_duration(duration):
     pattern = r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?'
@@ -100,6 +101,38 @@ def log_transform(log_views):
     plt.show()
 
 
+def random_forest(X, y, X_train, X_test, y_train, y_test):
+    rf = RandomForestRegressor(n_estimators=100, random_state=42)
+    rf.fit(X_train, y_train)
+
+    rf_preds = rf.predict(X_test)
+
+    rf_mae = mean_absolute_error(y_test, rf_preds)
+    rf_r2 = r2_score(y_test, rf_preds)
+
+    print("\n=== Random Forest ===")
+    print(f"MAE: {rf_mae:.4f}")
+    print(f"R²: {rf_r2:.4f}")
+
+    actual = np.expm1(y_test)
+    predicted = np.expm1(rf_preds)
+
+    # plot predictions
+    plt.figure()
+    plt.scatter(actual, predicted)
+    plt.xlabel("Actual (log views/day)")
+    plt.ylabel("Predicted")
+    plt.title("Random Forest: Actual vs Predicted")
+    plt.show()
+
+    feature_importance = pd.Series(rf.feature_importances_, index=X.columns)
+    feature_importance.sort_values().plot(kind="barh")
+    plt.title("Feature Importance (Random Forest)")
+    plt.show()
+
+    print("\nFeature Importance:")
+    print(feature_importance.sort_values(ascending=False))
+
 def main():
     df = load_data()
 
@@ -136,53 +169,36 @@ def main():
     X_test_scaled = scaler.transform(X_test)
 
     # linear regression
-    lr = LinearRegression()
-    lr.fit(X_train_scaled, y_train)
+    # lr = LinearRegression()
+    # lr.fit(X_train_scaled, y_train)
 
-    lr_preds = lr.predict(X_test_scaled)
+    # lr_preds = lr.predict(X_test_scaled)
 
-    lr_mae = mean_absolute_error(y_test, lr_preds)
-    lr_r2 = r2_score(y_test, lr_preds)
+    # lr_mae = mean_absolute_error(y_test, lr_preds)
+    # lr_r2 = r2_score(y_test, lr_preds)
 
-    print("\n=== Linear Regression ===")
-    print(f"MAE: {lr_mae:.4f}")
-    print(f"R²: {lr_r2:.4f}")
+    # print("\n=== Linear Regression ===")
+    # print(f"MAE: {lr_mae:.4f}")
+    # print(f"R²: {lr_r2:.4f}")
 
-    # random forest
-    rf = RandomForestRegressor(n_estimators=100, random_state=42)
-    rf.fit(X_train, y_train)
+    # # gbr
+    # gbr = GradientBoostingRegressor(random_state=42)
+    # gbr.fit(X_train, y_train)
 
-    rf_preds = rf.predict(X_test)
+    # gbr_preds = gbr.predict(X_test)
 
-    rf_mae = mean_absolute_error(y_test, rf_preds)
-    rf_r2 = r2_score(y_test, rf_preds)
+    # gbr_mae = mean_absolute_error(y_test, gbr_preds)
+    # gbr_r2 = r2_score(y_test, gbr_preds)
 
-    print("\n=== Random Forest ===")
-    print(f"MAE: {rf_mae:.4f}")
-    print(f"R²: {rf_r2:.4f}")
+    # print("\n=== Gradient Boosting ===")
+    # print(f"MAE: {gbr_mae:.4f}") 
+    # print(f"R²: {gbr_r2:.4f}")
 
-    actual = np.expm1(y_test)
-    predicted = np.expm1(rf_preds)
+    random_forest(X, y, X_train, X_test, y_train, y_test)
 
-    # plot predictions
-    plt.figure()
-    plt.scatter(actual, predicted)
-    plt.xlabel("Actual (log views/day)")
-    plt.ylabel("Predicted")
-    plt.title("Random Forest: Actual vs Predicted")
-    plt.show()
-
-    feature_importance = pd.Series(rf.feature_importances_, index=X.columns)
-    feature_importance.sort_values().plot(kind="barh")
-    plt.title("Feature Importance (Random Forest)")
-    plt.show()
-
-    print("\nFeature Importance:")
-    print(feature_importance.sort_values(ascending=False))
-
-    
 
 
 
 if __name__ == "__main__":
     main()  
+

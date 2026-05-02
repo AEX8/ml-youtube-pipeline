@@ -17,7 +17,7 @@ video_snippets = {}
 
 next_page_token = None
 
-while len(video_ids) < 100:
+while len(video_ids) < 400:
     request = youtube.search().list(
         part="snippet",
         channelId=CHANNEL_ID,
@@ -45,7 +45,7 @@ while len(video_ids) < 100:
 
 # avoid going over the limit
 video_ids = list(dict.fromkeys(video_ids))
-video_ids = video_ids[:100]
+video_ids = video_ids[:400]
 
 print(f"Fetched {len(video_ids)} video IDs")
 
