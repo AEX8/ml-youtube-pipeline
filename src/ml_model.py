@@ -10,8 +10,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import StratifiedKFold
+import joblib
+from pathlib import Path
 
 def parse_duration(duration):
     pattern = r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?'
@@ -169,6 +169,8 @@ def gradient_boosting(X, y, X_train, X_test, y_train, y_test):
     plt.title("Gradient Boosting: Actual vs Predicted")
     plt.show()
 
+    return gbr
+
 def main():
     df = load_data()
 
@@ -219,7 +221,15 @@ def main():
 
     random_forest(X, y, X_train, X_test, y_train, y_test)
 
-    gradient_boosting(X, y, X_train, X_test, y_train, y_test)
+    gbr_model = gradient_boosting(X, y, X_train, X_test, y_train, y_test)
+
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    MODEL_PATH = BASE_DIR / "models" / "gbr_model.pkl"
+
+    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+    joblib.dump(gbr_model, MODEL_PATH)
+    print(f"Model saved to {MODEL_PATH}")
 
 
 

@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timezone
 import re
-from database import fetch_videos
+from src.database import fetch_videos
+from src.predict import predict
+import matplotlib.pyplot as plt
 
 # Page Config
 st.set_page_config(page_title="YouTube Analytics", layout="wide")
@@ -97,3 +99,22 @@ st.scatter_chart(filtered_df[["days_since_upload", "views_per_day"]])
 # Raw Data
 st.subheader("Raw Data")
 st.dataframe(filtered_df)
+
+pred_df = predict()
+
+st.subheader("Top Predicted Performing Videos")
+
+top_pred = pred_df.sort_values("predicted_views_per_day", ascending=False).head(10)
+
+st.dataframe(
+    top_pred[["title", "predicted_views_per_day"]]
+)
+
+
+plt.figure()
+plt.barh(top_pred["title"], top_pred["predicted_views_per_day"])
+plt.title("Predicted Views per Day")
+plt.xlabel("Views per Day")
+plt.gca().invert_yaxis()
+
+st.pyplot(plt)
