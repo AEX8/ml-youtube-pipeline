@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error, r2_score
+from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import StratifiedKFold
@@ -133,6 +133,42 @@ def random_forest(X, y, X_train, X_test, y_train, y_test):
     print("\nFeature Importance:")
     print(feature_importance.sort_values(ascending=False))
 
+def gradient_boosting(X, y, X_train, X_test, y_train, y_test):
+    gbr = GradientBoostingRegressor(
+        n_estimators=200,
+        learning_rate=0.05,
+        max_depth=3,
+        random_state=42
+    )
+
+    gbr.fit(X_train, y_train)
+
+    preds = gbr.predict(X_test)
+
+    mae = mean_absolute_error(y_test, preds)
+    r2 = r2_score(y_test, preds)
+    rmse = np.sqrt(mean_squared_error(y_test, preds))
+
+    print("\n=== Gradient Boosting ===")
+    print(f"MAE (log): {mae:.4f}")
+    print(f"RMSE (log): {rmse:.4f}")
+    print(f"R²: {r2:.4f}")
+
+    # convert to real scale
+    actual = np.expm1(y_test)
+    predicted = np.expm1(preds)
+
+    real_mae = mean_absolute_error(actual, predicted)
+    print(f"MAE (real views/day): {real_mae:.2f}")
+
+    # plot
+    plt.figure()
+    plt.scatter(actual, predicted)
+    plt.xlabel("Actual Views per Day")
+    plt.ylabel("Predicted")
+    plt.title("Gradient Boosting: Actual vs Predicted")
+    plt.show()
+
 def main():
     df = load_data()
 
@@ -169,32 +205,21 @@ def main():
     X_test_scaled = scaler.transform(X_test)
 
     # linear regression
-    # lr = LinearRegression()
-    # lr.fit(X_train_scaled, y_train)
+    lr = LinearRegression()
+    lr.fit(X_train_scaled, y_train)
 
-    # lr_preds = lr.predict(X_test_scaled)
+    lr_preds = lr.predict(X_test_scaled)
 
-    # lr_mae = mean_absolute_error(y_test, lr_preds)
-    # lr_r2 = r2_score(y_test, lr_preds)
+    lr_mae = mean_absolute_error(y_test, lr_preds)
+    lr_r2 = r2_score(y_test, lr_preds)
 
-    # print("\n=== Linear Regression ===")
-    # print(f"MAE: {lr_mae:.4f}")
-    # print(f"R²: {lr_r2:.4f}")
-
-    # # gbr
-    # gbr = GradientBoostingRegressor(random_state=42)
-    # gbr.fit(X_train, y_train)
-
-    # gbr_preds = gbr.predict(X_test)
-
-    # gbr_mae = mean_absolute_error(y_test, gbr_preds)
-    # gbr_r2 = r2_score(y_test, gbr_preds)
-
-    # print("\n=== Gradient Boosting ===")
-    # print(f"MAE: {gbr_mae:.4f}") 
-    # print(f"R²: {gbr_r2:.4f}")
+    print("\n=== Linear Regression ===")
+    print(f"MAE: {lr_mae:.4f}")
+    print(f"R²: {lr_r2:.4f}")
 
     random_forest(X, y, X_train, X_test, y_train, y_test)
+
+    gradient_boosting(X, y, X_train, X_test, y_train, y_test)
 
 
 

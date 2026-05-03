@@ -3,6 +3,7 @@ import json
 import os
 from dotenv import load_dotenv
 from database import insert_videos
+from pathlib import Path
 
 load_dotenv()
 
@@ -81,8 +82,11 @@ for batch in chunk_list(video_ids, 50):
 
 print(f"Prepared {len(videos_data)} videos for insertion")
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_PATH = BASE_DIR / 'data' / 'youtube_data.json'
+
 # save
-with open("data/youtube_data.json", "w") as f:
+with open(DATA_PATH, "w") as f:
     json.dump(videos_data, f, indent=2)
 
 # save to databse
