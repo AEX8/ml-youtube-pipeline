@@ -1,15 +1,56 @@
-youtube-analytics-pipeline/
-│
-├── src/
-│   ├── ingestion.py
-│   ├── processing.py
-│   ├── database.py
-│
-├── dashboard/
-│   └── app.py
-│
-├── data/
-├── logs/
-├── tests/
-├── config.yaml
-└── README.md
+# YouTube Video Performance Prediction
+
+A machine learning pipeline that analyzes YouTube video data and predicts **average views per day** based on video and engagement features.
+
+## What It Does
+
+* Loads YouTube video data from a database
+* Cleans and preprocesses the data
+* Converts video duration into minutes
+* Calculates views per day and engagement metrics
+* Applies log transformation to the prediction target
+* Trains and compares multiple regression models
+* Saves the final Gradient Boosting model
+
+## Features Used
+
+The model uses:
+
+* Video duration
+* Days since upload
+* Number of likes
+* Comment ratio
+
+The prediction target is **views per day**.
+
+## Models
+
+Three models are trained and evaluated:
+
+* Linear Regression
+* Random Forest Regressor
+* Gradient Boosting Regressor
+
+Performance is evaluated using metrics such as **MAE, RMSE, and R²**.
+
+## Installation
+
+```bash
+pip install pandas numpy matplotlib scikit-learn joblib
+```
+
+## Running
+
+```bash
+python3 <script_name>.py
+```
+
+The script trains the models, displays their performance, and saves the Gradient Boosting model to:
+
+```text
+models/gbr_model.pkl
+```
+
+## Requirements
+
+The project requires a `database.py` file containing a `fetch_videos()` function that provides the YouTube video data.
